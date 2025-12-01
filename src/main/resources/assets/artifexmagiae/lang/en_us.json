@@ -1,0 +1,13 @@
+{
+  "itemGroup.artifexmagiae": "Example Mod Tab",
+  "block.artifexmagiae.example_block": "Example Block",
+  "item.artifexmagiae.example_item": "Example Item",
+
+  "artifexmagiae.configuration.title": "Artifex Magiae Configs",
+  "artifexmagiae.configuration.section.artifexmagiae.common.toml": "Artifex Magiae Configs",
+  "artifexmagiae.configuration.section.artifexmagiae.common.toml.title": "Artifex Magiae Configs",
+  "artifexmagiae.configuration.items": "Item List",
+  "artifexmagiae.configuration.logDirtBlock": "Log Dirt Block",
+  "artifexmagiae.configuration.magicNumberIntroduction": "Magic Number Text",
+  "artifexmagiae.configuration.magicNumber": "Magic Number"
+}
