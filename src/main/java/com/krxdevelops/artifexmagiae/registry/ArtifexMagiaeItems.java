@@ -1,6 +1,7 @@
 package com.krxdevelops.artifexmagiae.registry;
 
 import com.krxdevelops.artifexmagiae.ArtifexMagiae;
+import com.krxdevelops.artifexmagiae.item.WandItem;
 import net.minecraft.world.food.FoodProperties;
 import net.minecraft.world.item.Item;
 import net.neoforged.neoforge.registries.DeferredItem;
@@ -16,6 +17,10 @@ public class ArtifexMagiaeItems {
                     .saturationModifier(2f)
                     .build()
             ));
+
+    public static final DeferredItem<Item> WAND_ITEM = ITEMS.register(
+            "wand_item",
+            (name) -> new WandItem(name.getPath(), new Item.Properties()));
 
     public ArtifexMagiaeItems() {
         ArtifexMagiae.LOGGER.info("ArtifexMagiaeItems instantiated.");
