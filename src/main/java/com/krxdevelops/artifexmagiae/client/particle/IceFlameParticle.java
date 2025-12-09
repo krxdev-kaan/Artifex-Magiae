@@ -21,19 +21,16 @@ public class IceFlameParticle extends TextureSheetParticle {
     private double lastAngle;
     private double lastDistance;
 
-    protected IceFlameParticle(SpellParticleOptions options, ClientLevel level, double x, double y, double z, double angularSpeed, double floatingSpeed, double circularGrowthSpeed) {
-        super(level, x, y, z, angularSpeed, floatingSpeed, circularGrowthSpeed);
+    protected IceFlameParticle(SpellParticleOptions options, ClientLevel level, double x, double y, double z, double xSpeed, double ySpeed, double zSpeed) {
+        super(level, x, y, z, xSpeed, ySpeed, zSpeed);
         this.friction = 0;
-        this.angularSpeed = angularSpeed;
-        this.floatingSpeed = floatingSpeed;
-        this.circularGrowthSpeed = circularGrowthSpeed;
-        this.lifetime = (int)(4.0 / (Math.random() * 0.8 + 0.2)) + 2;
-        parentEntity = level.getEntity(options.getEntityID());
-
-        double parentDistanceX = this.x - parentEntity.getX();
-        double parentDistanceZ = this.z - parentEntity.getZ();
-        lastAngle = Mth.atan2(parentDistanceZ, parentDistanceX);
-        lastDistance = Mth.sqrt((float)(Mth.square(parentDistanceZ) + Mth.square(parentDistanceX)));
+        this.angularSpeed = options.getPath().circularPathParams().angularSpeed();
+        this.floatingSpeed = options.getPath().circularPathParams().floatingSpeed();
+        this.circularGrowthSpeed = options.getPath().circularPathParams().circularGrowthRate();
+        this.lifetime = (int)(options.getPath().duration());
+        parentEntity = level.getEntity(options.getPath().circularPathParams().referenceEntityID());
+        lastAngle = options.getPath().circularPathParams().initialAngle();
+        lastDistance = options.getPath().circularPathParams().initialDistance();
     }
 
     @Override
@@ -48,11 +45,13 @@ public class IceFlameParticle extends TextureSheetParticle {
         this.zo = this.z;
 
         double parentDistanceY = parentEntity.getY() - this.y;
+        double newAngle = this.lastAngle += angularSpeed;
+        double newDistance = this.lastDistance += circularGrowthSpeed;
 
         Vec3 displacementVector = new Vec3(
-                Mth.cos((float)(this.lastAngle += angularSpeed)) * (lastDistance += circularGrowthSpeed),
+                Mth.cos((float)newAngle) * newDistance,
                 -parentDistanceY + this.floatingSpeed,
-                Mth.sin((float)(this.lastAngle += angularSpeed)) * (lastDistance += circularGrowthSpeed)
+                Mth.sin((float)newAngle) * newDistance
         );
 
         if (this.age++ >= this.lifetime)

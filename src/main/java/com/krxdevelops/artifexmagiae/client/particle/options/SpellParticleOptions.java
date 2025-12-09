@@ -1,5 +1,6 @@
 package com.krxdevelops.artifexmagiae.client.particle.options;
 
+import com.krxdevelops.artifexmagiae.core.Path;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import io.netty.buffer.ByteBuf;
@@ -13,11 +14,11 @@ import org.jetbrains.annotations.NotNull;
 
 public class SpellParticleOptions implements ParticleOptions {
     private final ParticleType<SpellParticleOptions> type;
-    private final int parentEntityID;
+    private final Path path;
 
-    public SpellParticleOptions(ParticleType<SpellParticleOptions> type, int id) {
+    public SpellParticleOptions(ParticleType<SpellParticleOptions> type, Path path) {
         this.type = type;
-        this.parentEntityID = id;
+        this.path = path;
     }
 
     @Override
@@ -25,19 +26,19 @@ public class SpellParticleOptions implements ParticleOptions {
         return this.type;
     }
 
-    public int getEntityID() {
-        return this.parentEntityID;
+    public Path getPath() {
+        return this.path;
     }
 
-    public static SpellParticleOptions create(ParticleType<SpellParticleOptions> type, int id) {
-        return new SpellParticleOptions(type, id);
+    public static SpellParticleOptions create(ParticleType<SpellParticleOptions> type, Path path) {
+        return new SpellParticleOptions(type, path);
     }
 
     public static @NotNull MapCodec<SpellParticleOptions> codec(ParticleType<SpellParticleOptions> type) {
-        return Codec.INT.xmap(id -> new SpellParticleOptions(type, id), spo -> spo.parentEntityID).fieldOf("parentEntityID");
+        return Path.CODEC.xmap(p -> new SpellParticleOptions(type, p), spo -> spo.path).fieldOf("path");
     }
 
-    public static @NotNull StreamCodec<? super RegistryFriendlyByteBuf, SpellParticleOptions> streamCodec(ParticleType<SpellParticleOptions> type) {
-        return ByteBufCodecs.INT.map(id -> new SpellParticleOptions(type, id), spo -> spo.parentEntityID);
+    public static @NotNull StreamCodec<? super ByteBuf, SpellParticleOptions> streamCodec(ParticleType<SpellParticleOptions> type) {
+        return Path.STREAM_CODEC.map(p -> new SpellParticleOptions(type, p), spo -> spo.path);
     }
 }
