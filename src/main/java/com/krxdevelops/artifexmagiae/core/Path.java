@@ -6,8 +6,10 @@ import io.netty.buffer.ByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.util.ExtraCodecs;
+import net.minecraft.util.Mth;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.network.codec.NeoForgeStreamCodecs;
+import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3f;
 
 import java.util.List;
@@ -28,6 +30,25 @@ public record Path (PathType pathType, PathFollowType followType, double duratio
 
     public int getPathFollowType() {
         return followType.ordinal();
+    }
+
+    public Vec3 getPosition(double ticksPassed, @Nullable final Vec3 referenceEntityPos) {
+        switch (pathType) {
+            case CIRCULAR:
+                double angle = this.circularPathParams.initialAngle + this.circularPathParams.angularSpeed * ticksPassed;
+                double distance = this.circularPathParams.initialDistance + this.circularPathParams.circularGrowthRate * ticksPassed;
+                return (this.circularPathParams.reference != null ? this.circularPathParams.reference : referenceEntityPos).add(
+                    Mth.cos((float)angle) * distance,
+                    0.33 + this.circularPathParams.floatingSpeed * ticksPassed,
+                    Mth.sin((float)angle) * distance
+                );
+            case LINEAR:
+                return new Vec3(0, 0, 0);
+            case LINEAR_SMOOTH_TRANSITIVE:
+                return new Vec3(0, 0, 0);
+        }
+
+        return new Vec3(0, 0, 0);
     }
 
     public static Path createCircular(double duration, Vec3 reference, double initialAngle, double initialDistance, double angularSpeed, double floatingSpeed, double circularGrowthRate) {

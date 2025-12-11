@@ -1,6 +1,8 @@
 package com.krxdevelops.artifexmagiae.client.particle;
 
 import com.krxdevelops.artifexmagiae.client.particle.options.SpellParticleOptions;
+import com.krxdevelops.artifexmagiae.core.Path;
+import com.krxdevelops.artifexmagiae.core.PathType;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.particle.*;
 import net.minecraft.util.Mth;
@@ -9,28 +11,24 @@ import net.minecraft.world.phys.Vec3;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
 @OnlyIn(Dist.CLIENT)
 public class IceFlameParticle extends TextureSheetParticle {
-    private final Entity parentEntity;
-    private final double angularSpeed;
-    private final double floatingSpeed;
-    private final double circularGrowthSpeed;
-    private double lastAngle;
-    private double lastDistance;
+    private final Path particlePath;
+    private final @Nullable Entity parentEntity;
 
     protected IceFlameParticle(SpellParticleOptions options, ClientLevel level, double x, double y, double z, double xSpeed, double ySpeed, double zSpeed) {
         super(level, x, y, z, xSpeed, ySpeed, zSpeed);
         this.friction = 0;
-        this.angularSpeed = options.getPath().circularPathParams().angularSpeed();
-        this.floatingSpeed = options.getPath().circularPathParams().floatingSpeed();
-        this.circularGrowthSpeed = options.getPath().circularPathParams().circularGrowthRate();
+        this.particlePath = options.getPath();
         this.lifetime = (int)(options.getPath().duration());
-        parentEntity = level.getEntity(options.getPath().circularPathParams().referenceEntityID());
-        lastAngle = options.getPath().circularPathParams().initialAngle();
-        lastDistance = options.getPath().circularPathParams().initialDistance();
+        if (options.getPath().circularPathParams().reference() == null)
+            parentEntity = level.getEntity(options.getPath().circularPathParams().referenceEntityID());
+        else
+            parentEntity = null;
     }
 
     @Override
@@ -44,24 +42,12 @@ public class IceFlameParticle extends TextureSheetParticle {
         this.yo = this.y;
         this.zo = this.z;
 
-        double parentDistanceY = parentEntity.getY() - this.y;
-        double newAngle = this.lastAngle += angularSpeed;
-        double newDistance = this.lastDistance += circularGrowthSpeed;
-
-        Vec3 displacementVector = new Vec3(
-                Mth.cos((float)newAngle) * newDistance,
-                -parentDistanceY + this.floatingSpeed,
-                Mth.sin((float)newAngle) * newDistance
-        );
+        Vec3 newPos = this.particlePath.getPosition(this.age, this.parentEntity != null ? this.parentEntity.position() : null);
 
         if (this.age++ >= this.lifetime)
             this.remove();
         else {
-            this.setPos(
-                    parentEntity.getX() + displacementVector.x,
-                    parentEntity.getY() + displacementVector.y,
-                    parentEntity.getZ() + displacementVector.z
-            );
+            this.setPos(newPos.x, newPos.y, newPos.z);
         }
     }
 
