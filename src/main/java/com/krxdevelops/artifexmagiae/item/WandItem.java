@@ -40,47 +40,26 @@ public class WandItem extends AMBaseItem {
     public void onUseTick(@NotNull Level level, @NotNull LivingEntity livingEntity, @NotNull ItemStack stack, int remainingUseDuration) {
         int passedTick = Integer.MAX_VALUE - remainingUseDuration;
         if (level.isClientSide()) {
-            /*if (passedTick % 8 == 0) {
-                for (int i = 0; i < 32; i++) {
-                    float deg = (Mth.RAD_TO_DEG * i * 11.25f) + (passedTick % 16 == 0 ? (Mth.RAD_TO_DEG * 5.625f) : 0);
-                    for (int k = 0; k < 1; k++) {
-                        SpellParticleOptions options = new SpellParticleOptions(
-                                ArtifexMagiaeParticleTypes.TEST_PARTICLE.get(),
-                                Path.createCircular(10, livingEntity.getId(), deg, 1, 0.15, 0.05, 0.1)
-                        );
-                        level.addParticle(
-                                options,
-                                livingEntity.getX() + Mth.cos(deg),
-                                livingEntity.getY() + 0.25,
-                                livingEntity.getZ() + Mth.sin(deg),
-                                0.15,
-                                0.05,
-                                0.1
-                        );
-                    }
-                }
-            }*/
             for (int i = 0; i < (passedTick % 8 == 0 ? 32 : 4); i++) {
-                float deg = (Mth.RAD_TO_DEG * i * (passedTick % 8 == 0 ? 11.25f : 90.0f)) + (((Mth.PI * 0.5f) / 8) * (passedTick % 8));
-                for (int k = 0; k < 1; k++) {
-                    SpellParticleOptions options = new SpellParticleOptions(
-                            ArtifexMagiaeParticleTypes.TEST_PARTICLE.get(),
-                            Path.createCircular(20, livingEntity.getId(), deg, 1, 0.1, 0.08, 0.1)
-                    );
-                    level.addParticle(
-                            options,
-                            livingEntity.getX() + Mth.cos(deg),
-                            livingEntity.getY() + 0.25,
-                            livingEntity.getZ() + Mth.sin(deg),
-                            0.15,
-                            0.05,
-                            0.1
-                    );
-                }
+                float deg = (Mth.DEG_TO_RAD * i * (passedTick % 8 == 0 ? 11.25f : 90.0f)) + (((Mth.PI * 0.5f) / 8) * (passedTick % 8));
+                SpellParticleOptions options = new SpellParticleOptions(
+                        ArtifexMagiaeParticleTypes.TEST_PARTICLE.get(),
+                        Path.createCircular(20, livingEntity.getId(), deg, 1, 0.1, 0.08, 0.1)
+                );
+
+                level.addParticle(
+                        options,
+                        livingEntity.getX(),
+                        livingEntity.getY(),
+                        livingEntity.getZ(),
+                        0,
+                        0,
+                        0
+                );
             }
         }
         else {
-            double currentRadius = Mth.clamp(1.0 + passedTick * 0.055, 1, 3);
+            double currentRadius = Mth.clamp(1.0 + passedTick * 0.1, 1, 3);
             AABB aoeRange = livingEntity.getBoundingBox().inflate(currentRadius);
             List<Entity> affectedEntities = level.getEntities(livingEntity, aoeRange, (e) -> e.getBoundingBox().distanceToSqr(livingEntity.position()) <= currentRadius*currentRadius);
             affectedEntities.forEach(e -> {
